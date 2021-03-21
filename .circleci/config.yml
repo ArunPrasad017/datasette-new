@@ -2,7 +2,7 @@
 version: 2.1
 # Use a package of configuration called an orb.
 orbs:
-  aws-elastic-beanstalk: circleci/aws-elastic-beanstalk@1.0.2
+  welcome: circleci/welcome-orb@0.4.1
 # Orchestrate or schedule a set of jobs
 jobs:
   build:
