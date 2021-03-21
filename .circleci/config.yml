@@ -2,20 +2,15 @@
 version: 2.1
 # Use a package of configuration called an orb.
 orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
+  aws-elastic-beanstalk: circleci/aws-elastic-beanstalk@1.0.2
 # Orchestrate or schedule a set of jobs
-
 jobs:
-  deploy:
+  build:
     working_directory: ~/app
     docker:
       - image: arundocker017/datasette-app
     steps:
       - checkout
-      - run:
-          name: initial run
-          command: echo "Hello"
       - run:
           name: Installing deployment dependencies
           working_directory: /
@@ -27,8 +22,7 @@ jobs:
       #     name: Deploying
       #     command: eb deploy datasette-application-docker
 workflows:
-  # Name the workflow "welcome"
-  welcome:
+  build_and_test:
     # Run the welcome/run job in its own container
     jobs:
-      - welcome/run
+      - build
