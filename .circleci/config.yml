@@ -6,7 +6,7 @@ orbs:
 # Orchestrate or schedule a set of jobs
 jobs:
   build:
-    working_directory: ~/app
+    # working_directory: ~/app
     docker:
       - image: arundocker017/datasette-app
     steps:
