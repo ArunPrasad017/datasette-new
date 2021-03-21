@@ -10,3 +10,4 @@ EXPOSE 90
 
 RUN chmod +x /app/docker-entrypoint.sh
 # ENTRYPOINT ["/app/docker-entrypoint.sh"]
+ENTRYPOINT ["echo", "Hello World"]
