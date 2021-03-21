@@ -8,7 +8,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: arundocker017/basic-flask-app:latest
+      - image: arundocker017/datasette:latest
     steps:
       - checkout
       - run:
