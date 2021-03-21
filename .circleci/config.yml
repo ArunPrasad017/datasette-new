@@ -6,11 +6,13 @@ orbs:
 # Orchestrate or schedule a set of jobs
 jobs:
   build:
-    working_directory: ~/app
     docker:
       - image: arundocker017/datasette-app
     steps:
       - checkout
+      - run:
+          name: Hello World
+          command: echo "Hello World"
 workflows:
   build_and_test:
     # Run the welcome/run job in its own container
