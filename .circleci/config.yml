@@ -8,7 +8,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: arundocker017/datasette-app:latest
+      - image: arundocker017/datasette_beanstalk:latest
     steps:
       - checkout
       - run:
