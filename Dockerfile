@@ -10,4 +10,4 @@ FROM python:3.9
 
 # RUN chmod +x /app/docker-entrypoint.sh
 # ENTRYPOINT ["/app/docker-entrypoint.sh"]
-ENTRYPOINT ["echo", "Hello World"]
+# ENTRYPOINT ["echo", "Hello World"]

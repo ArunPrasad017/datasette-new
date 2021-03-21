@@ -6,21 +6,11 @@ orbs:
 # Orchestrate or schedule a set of jobs
 jobs:
   build:
-    # working_directory: ~/app
+    working_directory: ~/app
     docker:
       - image: arundocker017/datasette-app
     steps:
       - checkout
-      # - run:
-      #     name: Installing deployment dependencies
-      #     working_directory: /
-      #     command: |
-      #       sudo apt-get -y -qq update
-      #       sudo apt-get install python3-pip python3-dev build-essential
-      #       sudo pip3 install awsebcli
-      # - run:
-      #     name: Deploying
-      #     command: eb deploy datasette-application-docker
 workflows:
   build_and_test:
     # Run the welcome/run job in its own container
