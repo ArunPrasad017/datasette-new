@@ -4,17 +4,18 @@ version: 2.1
 orbs:
   welcome: circleci/welcome-orb@0.4.1
 # Orchestrate or schedule a set of jobs
-jobs:
-  build:
-    docker:
-      - image: arundocker017/datasette-app
-    steps:
-      - checkout
-      - run:
-          name: Hello World
-          command: echo "Hello World"
+# jobs:
+#   build:
+#     docker:
+#       - image: arundocker017/datasette-app
+#     steps:
+#       - checkout
+#       - run:
+#           name: Hello World
+#           command: echo "Hello World"
 workflows:
-  build_and_test:
+  # Name the workflow "welcome"
+  welcome:
     # Run the welcome/run job in its own container
     jobs:
-      - build
+      - welcome/run
