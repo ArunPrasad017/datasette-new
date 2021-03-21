@@ -5,6 +5,27 @@ orbs:
   # Declare a dependency on the welcome-orb
   welcome: circleci/welcome-orb@0.4.1
 # Orchestrate or schedule a set of jobs
+
+jobs:
+  deploy:
+    working_directory: ~/app
+    docker:
+      - image: arundocker017/datasette-app
+    steps:
+      - checkout
+      - run:
+          name: initial run
+          command: echo "Hello"
+      - run:
+          name: Installing deployment dependencies
+          working_directory: /
+          command: |
+            sudo apt-get -y -qq update
+            sudo apt-get install python3-pip python3-dev build-essential
+            sudo pip3 install awsebcli
+      # - run:
+      #     name: Deploying
+      #     command: eb deploy datasette-application-docker
 workflows:
   # Name the workflow "welcome"
   welcome:
