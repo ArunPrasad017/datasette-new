@@ -3,16 +3,19 @@ version: 2.1
 
 jobs:
   build:
+    environment:
+      IMAGE_NAME: arundocker017/datasette-new
     docker:
-      - image: stefanogallotti/adventofcode
+      - image: circleci/buildpack-deps:stretch
     steps:
       - checkout
+      - setup_remote_docker
       - run:
-         name: Hello World
-         command: echo "Hello World"
+         name: Build Docker Image
+         command: docker build -t $IMAGE_NAME:latest .
 workflows:
   # Name the workflow "welcome"
-  example:
+  build-branch:
     # Run the welcome/run job in its own container
     jobs:
       - build
