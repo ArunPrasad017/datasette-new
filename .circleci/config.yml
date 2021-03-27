@@ -1,21 +1,35 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-
-jobs:
-  build:
+executors:
+  docker-publisher:
     environment:
       IMAGE_NAME: arundocker017/datasette-new
     docker:
       - image: circleci/buildpack-deps:stretch
+jobs:
+  build:
+    executor: docker-publisher
     steps:
       - checkout
       - setup_remote_docker
       - run:
          name: Build Docker Image
          command: docker build -t $IMAGE_NAME:latest .
+  publish-latest:
+    executor: docker-publisher
+    steps:
+      - setup_remote_docker
+      - run:
+          name: Publish latest docker image to dockerhub
+          command: |
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            docker push $IMAGE_NAME:latest
 workflows:
   # Name the workflow "welcome"
   build-branch:
     # Run the welcome/run job in its own container
     jobs:
       - build
+      - publish-latest:
+          requires:
+            - build
