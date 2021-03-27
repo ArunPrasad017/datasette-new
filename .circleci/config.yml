@@ -15,10 +15,22 @@ jobs:
       - run:
          name: Build Docker Image
          command: docker build -t $IMAGE_NAME:latest .
+      - run:
+          name: Save docker image to local
+          command: docker save -o image.tar $IMAGE_NAME
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
   publish-latest:
     executor: docker-publisher
     steps:
+      - attach_workspace:
+          at: /tmp/workspace
       - setup_remote_docker
+      - run:
+          name: Load the saved docker image
+          command: docker load -i /tmp/workspace/image.tar
       - run:
           name: Publish latest docker image to dockerhub
           command: |
