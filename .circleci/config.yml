@@ -47,7 +47,7 @@ jobs:
           command: |
             sudo apt-get -y -qq update
             sudo apt-get install python3-pip python3-dev build-essential
-            suod pip3 install awsebcli
+            sudo pip3 install awsebcli
       - run:
           name: Deploying
           command: eb deploy Datasettedockerappprod-env
@@ -59,4 +59,6 @@ workflows:
       - publish-latest:
           requires:
             - build
-      - deploy
+      - deploy:
+          requires:
+            - publish-latest
