@@ -36,12 +36,27 @@ jobs:
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push $IMAGE_NAME:latest
+    deploy:
+      docker:
+        - image: arundocker017/datasette-new
+      steps:
+        - checkout
+        - run:
+            name: Installing deployment dependencies
+            working_directory: /
+            command: |
+              sudo apt-get -y -qq update
+              sudo apt-get install python3-pip python3-dev build-essential
+              suod pip3 install awsebcli
+        - run:
+            name: Deploying
+            command: eb deploy Datasettedockerappprod-env
 workflows:
-  # Name the workflow "welcome"
   build-branch:
-    # Run the welcome/run job in its own container
+    # Run the job in its own container
     jobs:
       - build
       - publish-latest:
           requires:
             - build
+      - deploy

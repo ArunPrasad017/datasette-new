@@ -1,0 +1,9 @@
+branch-defaults:
+  master:
+    environment: Datasettedockerappprod-env
+global:
+  application_name: Datasette-Docker-app-prod
+  default_ec2_keyname: M1-EC2-KeyPair
+  default_platform: Docker running on 64bit Amazon Linux 2
+  default_region: us-east-1
+  sc: git
