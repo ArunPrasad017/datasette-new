@@ -8,4 +8,10 @@ resource "aws_elastic_beanstalk_environment" "datasette_docker_env" {
   application         = aws_elastic_beanstalk_application.datasette_docker_app.name
   solution_stack_name = "64bit Amazon Linux 2 v3.2.6 running Docker"
   tier                = "WebServer"
+
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "IamInstanceProfile"
+    value     = "aws-elasticbeanstalk-ec2-role"
+  }
 }
