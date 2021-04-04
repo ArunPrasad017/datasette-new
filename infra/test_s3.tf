@@ -1,3 +1,8 @@
+provider "aws" {
+    alias  = "us_east_1"
+    region = "us-east-1"
+}
+
 resource "aws_s3_bucket" "bucket1"{
     bucket = "test-s3-bucket"
     acl = "private"
