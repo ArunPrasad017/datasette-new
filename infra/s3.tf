@@ -9,3 +9,12 @@ resource "aws_s3_bucket" "bucket1"{
         Environment = "test"
     }
 }
+
+terraform {
+  backend "s3" {
+    bucket  = "aruntestbucketaws"
+    key     = "state/s3/s3_test.tfstate"
+    region  = "us-east-1"
+    encrypt = true
+  }
+}
