@@ -1,7 +1,3 @@
-provider "aws" {
-    region = "us-east-1"
-}
-
 resource "aws_elastic_beanstalk_application" "datasette_docker_app" {
   name        = "datasette-docker-app"
   description = "placeholder datasette-docker-app for deploying datasette image to elbs environment"
