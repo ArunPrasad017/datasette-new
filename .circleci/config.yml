@@ -47,7 +47,7 @@ jobs:
           command: |
             cd infra/
             terraform init -input=false
-            terraform plan -out tfapply
+            terraform plan -out tfapply -var-file variables.tfvars
       - persist_to_workspace:
           root: .
           paths:
