@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "bucket1"{
-    bucket = "test-s3-bucket"
+    bucket = "arun-tf-s3-bucket"
     acl = "private"
     versioning{
         enabled = true
