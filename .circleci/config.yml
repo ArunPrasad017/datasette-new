@@ -68,6 +68,7 @@ jobs:
           name: terraform
           command: |
             cd infra/
+            ls -l
             terraform apply -auto-approve tfapply
       - persist_to_workspace:
           root: .
