@@ -72,16 +72,11 @@ workflows:
   build-branch:
     # Run the welcome/run job in its own container
     jobs:
-      - plan-apply
-      - build:
-          requires:
-            - publish-latest
+      - build
       - publish-latest:
           requires:
             - build
-      # - plan-apply:
-      #     requires:
-      #       - publish-latest
+      - plan-apply
       - hold-apply:
           type: approval
           requires:
