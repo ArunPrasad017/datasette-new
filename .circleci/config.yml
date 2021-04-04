@@ -52,11 +52,12 @@ jobs:
           command: |
             cd infra/
             terraform plan -out tfapply -var-file variables.tfvars
+            ls -l
+            pwd
       - persist_to_workspace:
           root: .
           paths:
             - .
-
   apply:
     docker:
       - image: hashicorp/terraform:light
@@ -66,6 +67,7 @@ jobs:
       - run:
           name: terraform
           command: |
+            cd infra/
             terraform apply -auto-approve tfapply
       - persist_to_workspace:
           root: .
