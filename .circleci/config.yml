@@ -81,7 +81,9 @@ workflows:
       - publish-latest:
           requires:
             - build
-      - plan-apply
+      - plan-apply:
+          requires:
+            - publish-latest
       - hold-apply:
           type: approval
           requires:
