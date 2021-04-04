@@ -6,6 +6,7 @@ provider "aws" {
 resource "aws_s3_bucket" "bucket1"{
     bucket = "test-s3-bucket"
     acl = "private"
+    region = "us-east-1"
     versioning{
         enabled = true
     }
