@@ -42,10 +42,10 @@ jobs:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
       - checkout
-      - working_directory: /infra
       - run:
           name: terraform init & plan
           command: |
+            cd infra/
             terraform init -input=false
             terraform plan -out tfapply
       - persist_to_workspace:
