@@ -37,7 +37,7 @@ jobs:
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push $IMAGE_NAME:latest
   plan-apply:
-    working_directory: /tmp/project/infra
+    working_directory: /tmp/project/
     docker:
       - image: hashicorp/terraform:light
     steps:
@@ -45,6 +45,7 @@ jobs:
       - run:
           name: terraform init & plan
           command: |
+            cd infra/
             terraform init -input=false
       - run:
           name: terraform plan
