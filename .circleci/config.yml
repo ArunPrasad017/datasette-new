@@ -39,7 +39,7 @@ jobs:
   plan-apply:
     working_directory: /tmp/project
     docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: hashicorp/terraform:light
     steps:
       - checkout
       - run:
@@ -57,11 +57,9 @@ jobs:
           paths:
             - .
 
-
-
   apply:
     docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+      - image: hashicorp/terraform:light
     steps:
       - attach_workspace:
           at: .
