@@ -45,9 +45,9 @@ jobs:
       - run:
           name: terraform init & plan
           command: |
-            ls -l
+            cd infra/
             terraform init -input=false
-            terraform plan -out tfapply -var-file ./infra/variables.tfvars
+            terraform plan -out tfapply -var-file variables.tfvars
       - persist_to_workspace:
           root: .
           paths:
@@ -72,13 +72,16 @@ workflows:
   build-branch:
     # Run the welcome/run job in its own container
     jobs:
-      - build
+      - plan-apply
+      - build:
+          requires:
+            - publish-latest
       - publish-latest:
           requires:
             - build
-      - plan-apply:
-          requires:
-            - publish-latest
+      # - plan-apply:
+      #     requires:
+      #       - publish-latest
       - hold-apply:
           type: approval
           requires:
