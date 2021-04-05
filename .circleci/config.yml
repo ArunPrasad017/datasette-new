@@ -84,7 +84,7 @@ jobs:
           command: |
             ls -l
             eb init --region us-east-1 --platform Docker
-            eb status datasette-docker-env
+            eb list --all
 
 workflows:
   # Name the workflow "welcome"
