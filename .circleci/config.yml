@@ -86,7 +86,6 @@ jobs:
             eb init --region us-east-1 --platform Docker
             eb list --all
             eb use "datasette-docker-env"
-            eb list --all
             eb health
             eb status
 
