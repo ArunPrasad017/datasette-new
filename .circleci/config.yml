@@ -83,7 +83,7 @@ jobs:
       - run:
           command: |
             ls -l
-            eb init --region us-east-1 --platform Docker AL2 version 3.2.6 datasette-docker-app
+            eb init --region us-east-1 --platform Docker
             eb status datasette-docker-env
 
 workflows:
