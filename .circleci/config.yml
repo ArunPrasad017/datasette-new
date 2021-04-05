@@ -87,6 +87,7 @@ jobs:
             ls -l
             eb list --all
             eb use datasette-docker-env
+            eb health
 
 workflows:
   # Name the workflow "welcome"
