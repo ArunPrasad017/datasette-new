@@ -83,6 +83,7 @@ jobs:
       - run:
           command: |
             ls -l
+            eb init
             eb health datasette-docker-env
 
 workflows:
@@ -91,19 +92,17 @@ workflows:
     # Run the welcome/run job in its own container
     jobs:
       - build
-      - publish-latest:
-          requires:
-            - build
-      - plan-apply:
-          requires:
-            - publish-latest
-      - hold-apply:
-          type: approval
-          requires:
-            - plan-apply
-      - apply:
-          requires:
-            - hold-apply
-      - eb-demo:
-          requires:
-            - apply
+      # - publish-latest:
+      #     requires:
+      #       - build
+      # - plan-apply:
+      #     requires:
+      #       - publish-latest
+      # - hold-apply:
+      #     type: approval
+      #     requires:
+      #       - plan-apply
+      # - apply:
+      #     requires:
+      #       - hold-apply
+      - eb-demo
