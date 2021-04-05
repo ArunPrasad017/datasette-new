@@ -88,6 +88,7 @@ jobs:
             echo "-------------------------"
             eb use datasette-docker-env
             eb status
+            eb deploy
 
 workflows:
   # Name the workflow "welcome"
