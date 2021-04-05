@@ -82,12 +82,12 @@ jobs:
       - eb/setup
       - run:
           command: |
-            ls -l
-            eb init --region us-east-1 --platform Docker
+            eb init --region us-east-1 --p docker datasette-docker-app
             ls -l
             eb list --all
+            echo "-------------------------"
             eb use datasette-docker-env
-            eb health
+            eb status
 
 workflows:
   # Name the workflow "welcome"
