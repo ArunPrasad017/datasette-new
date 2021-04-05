@@ -82,7 +82,7 @@ jobs:
       - eb/setup
       - run:
           command: |
-            eb init --region us-east-1 --p docker datasette-docker-app
+            eb init datasette-docker-app --region us-east-1 --platform docker
             ls -l
             eb list --all
             echo "-------------------------"
