@@ -98,6 +98,7 @@ jobs:
       - run:
           name: terraform create destroy plan
           command: |
+            cd infra/
             terraform plan -destroy -out tfdestroy -var-file variables.tfvars
       - persist_to_workspace:
           root: .
@@ -112,6 +113,7 @@ jobs:
       - run:
           name: terraform destroy
           command: |
+            cd infra/
             terraform apply -auto-approve tfdestroy
 workflows:
   # Name the workflow "welcome"
