@@ -83,7 +83,8 @@ jobs:
       - run:
           command: |
             ls -l
-            eb deploy .
+            eb init --region us-east-1 --platform Docker AL2 version 3.2.6 datasette-docker-app
+            eb status datasette-docker-env
 
 workflows:
   # Name the workflow "welcome"
