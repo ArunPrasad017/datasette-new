@@ -83,8 +83,7 @@ jobs:
       - run:
           command: |
             ls -l
-            eb init
-            eb health datasette-docker-env
+            eb deploy .
 
 workflows:
   # Name the workflow "welcome"

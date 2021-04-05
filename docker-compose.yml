@@ -1,0 +1,6 @@
+version: '3.8'
+services:
+  beanstalk-flask:
+    image: "arundocker017/datasette-new"
+    ports:
+      - "80:8001"
