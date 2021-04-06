@@ -81,7 +81,6 @@ jobs:
       - aws-cli/setup
       - run:
           command: |
-            cd infra/
             ls -l
             aws s3 cp docker-compose.yml s3://arun-tf-s3-bucket/beanstalk/datasette-docker-env/docker-compose.yml
             aws s3 ls s3://arun-tf-s3-bucket
