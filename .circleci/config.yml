@@ -109,7 +109,9 @@ jobs:
             cd infra/
             terraform apply -auto-approve tfdestroy
 workflows:
+  # Name the workflow "welcome"
   build-branch:
+    # Run the welcome/run job in its own container
     jobs:
       - build
       - publish-latest:
@@ -125,10 +127,9 @@ workflows:
       - apply:
           requires:
             - hold-apply
-      - eb-deploy:
+      - eb-cli-deploy:
           requires:
             - apply
-
       # - plan-destroy:
       #     requires:
       #       - apply
