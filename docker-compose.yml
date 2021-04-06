@@ -3,4 +3,4 @@ services:
   beanstalk-flask:
     image: "arundocker017/datasette-new"
     ports:
-      - "80:8001"
+      - "80:90"
