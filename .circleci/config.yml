@@ -135,13 +135,13 @@ workflows:
       - eb-cli-deploy:
           requires:
             - apply
-      # - plan-destroy:
-      #     requires:
-      #       - apply
-      # - hold-destroy:
-      #     type: approval
-      #     requires:
-      #       - plan-destroy
-      # - destroy:
-      #     requires:
-      #       - hold-destroy
+      - plan-destroy:
+          requires:
+            - eb-cli-deploy
+      - hold-destroy:
+          type: approval
+          requires:
+            - plan-destroy
+      - destroy:
+          requires:
+            - hold-destroy
