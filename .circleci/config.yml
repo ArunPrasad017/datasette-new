@@ -82,8 +82,8 @@ jobs:
       - run:
           command: |
             aws s3 cp docker-compose.yml s3://arun-tf-s3-bucket/beanstalk/datasette-docker-env/docker-compose.yml
-            aws elasticbeanstalk create-application-version --application-name datasette-docker-app --source-bundle S3Bucket="arun-tf-s3-bucket",S3Key="beanstalk/datasette-docker-env/docker-compose.yml" --version-label "ver-3" --region us-east-1
-            aws elasticbeanstalk update-environment --environment-name datasette-docker-env --version-label "ver-3" --region us-east-1
+            aws elasticbeanstalk create-application-version --application-name datasette-docker-app --source-bundle S3Bucket="arun-tf-s3-bucket",S3Key="beanstalk/datasette-docker-env/docker-compose.yml" --version-label "ver-4" --region us-east-1
+            aws elasticbeanstalk update-environment --environment-name datasette-docker-env --version-label "ver-4" --region us-east-1
   plan-destroy:
     docker:
       - image: hashicorp/terraform:light
