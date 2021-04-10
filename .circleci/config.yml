@@ -125,7 +125,7 @@ workflows:
       - hold-apply:
           filters:
             branches:
-              ignore:
+              only:
                   - master
           type: approval
           requires:
@@ -133,14 +133,14 @@ workflows:
       - apply:
           filters:
             branches:
-              ignore:
+              only:
                   - master
           requires:
             - hold-apply
       - eb-cli-deploy:
           filters:
             branches:
-              ignore:
+              only:
                   - master
           requires:
             - apply
@@ -150,7 +150,7 @@ workflows:
       - hold-destroy:
           filters:
             branches:
-              ignore:
+              only:
                   - master
           type: approval
           requires:
@@ -158,7 +158,7 @@ workflows:
       - destroy:
           filters:
             branches:
-              ignore:
+              only:
                   - master
           requires:
             - hold-destroy
