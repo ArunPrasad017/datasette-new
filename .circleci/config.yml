@@ -9,6 +9,17 @@ executors:
     docker:
       - image: circleci/buildpack-deps:stretch
 jobs:
+  pre-commit-check:
+    docker:
+      - image: cimg/python:3.9.4
+    steps:
+      - checkout
+      - run:
+          name: Install pre-commit
+          command: pip install pre-commit
+      - run:
+          name: Run pre-commit
+          command: pre-commit run --all-files
   build:
     executor: docker-publisher
     steps:
