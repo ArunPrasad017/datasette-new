@@ -1,5 +1,6 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
+[![Documentation Status](https://readthedocs.org/projects/mypy/badge/?version=stable)](https://mypy.readthedocs.io/en/stable/?badge=stable)
 
 
 # datasette-new
@@ -11,3 +12,5 @@ Datasette
 - Open browser and navigate to 0.0.0.0:90 to see the datasette application in action
 
 # Current CI pipeline is automated to building and pushing to dockerhub
+
+CI pipeline - https://app.circleci.com/pipelines/github/ArunPrasad017/datasette-new
