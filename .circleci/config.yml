@@ -123,22 +123,42 @@ workflows:
           requires:
             - publish-latest
       - hold-apply:
+          filters:
+            branches:
+              only:
+                  - master
           type: approval
           requires:
             - plan-apply
       - apply:
+          filters:
+            branches:
+              only:
+                  - master
           requires:
             - hold-apply
       - eb-cli-deploy:
+          filters:
+            branches:
+              only:
+                  - master
           requires:
             - apply
       - plan-destroy:
           requires:
             - eb-cli-deploy
       - hold-destroy:
+          filters:
+            branches:
+              only:
+                  - master
           type: approval
           requires:
             - plan-destroy
       - destroy:
+          filters:
+            branches:
+              only:
+                  - master
           requires:
             - hold-destroy
