@@ -16,7 +16,3 @@ repos:
     rev: 'v0.812'  # Use the sha / tag you want to point at
     hooks:
     -   id: mypy
--   repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.12 # Get the latest from: https://github.com/gruntwork-io/pre-commit/releases
-    hooks:
-      - id: shellcheck
