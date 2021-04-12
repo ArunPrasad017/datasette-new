@@ -126,7 +126,10 @@ workflows:
   build-branch:
     # Run the welcome/run job in its own container
     jobs:
-      - build
+      - pre-commit-check
+      - build:
+          requires:
+            - pre-commit-check
       - publish-latest:
           requires:
             - build
