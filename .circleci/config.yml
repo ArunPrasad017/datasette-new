@@ -124,19 +124,35 @@ workflows:
   build-branch:
     jobs:
       - pre-commit-check
-      - build-publish-image
+      - build-publish-image:
+          requires:
+            - pre-commit-check
       - hold-infra-build:
           type: approval
           requires:
             - build-publish-image
+          filters:
+            branches:
+              only: master
       - run-infra-build:
           requires:
             - hold-infra-build
-      - elb-application-deploy
+          filters:
+            branches:
+              only: master
+      - elb-application-deploy:
+          requires:
+            - build-publish-image
       - hold-destroy:
           type: approval
           requires:
             - elb-application-deploy
+          filters:
+            branches:
+              only: master
       - run-infra-destroy:
           requires:
             - hold-destroy
+          filters:
+            branches:
+              only: master
