@@ -23,7 +23,7 @@ jobs:
       - run:
           name: Run pre-commit
           command: pre-commit run --all-files
-  build:
+  build-publish-image:
     executor: docker-publisher
     steps:
       - checkout
@@ -34,16 +34,6 @@ jobs:
       - run:
           name: Save docker image to local
           command: docker save -o image.tar $IMAGE_NAME
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./image.tar
-  publish-latest:
-    executor: docker-publisher
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - setup_remote_docker
       - run:
           name: Load the saved docker image
           command: docker load -i /tmp/workspace/image.tar
@@ -52,6 +42,24 @@ jobs:
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push $IMAGE_NAME:latest
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+  # publish-latest:
+  #   executor: docker-publisher
+  #   steps:
+  #     - attach_workspace:
+  #         at: /tmp/workspace
+  #     - setup_remote_docker
+  #     - run:
+  #         name: Load the saved docker image
+  #         command: docker load -i /tmp/workspace/image.tar
+  #     - run:
+  #         name: Publish latest docker image to dockerhub
+  #         command: |
+  #           echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+  #           docker push $IMAGE_NAME:latest
   run-infra-build:
     working_directory: /tmp/project/
     docker:
@@ -112,27 +120,19 @@ jobs:
           paths:
             - .
 workflows:
-  # Name the workflow "welcome"
+  version: 2
   build-branch:
-    # Run the welcome/run job in its own container
     jobs:
       - pre-commit-check
-      - build:
-          requires:
-            - pre-commit-check
-      - publish-latest:
-          requires:
-            - build
+      - build-publish-image
       - hold-infra-build:
           type: approval
           requires:
-            - publish-latest
+            - build-publish-image
       - run-infra-build:
           requires:
             - hold-infra-build
-      - elb-application-deploy:
-          requires:
-            - run-infra-build
+      - elb-application-deploy
       - hold-destroy:
           type: approval
           requires:
