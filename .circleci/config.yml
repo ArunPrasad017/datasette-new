@@ -36,7 +36,7 @@ jobs:
           command: docker save -o image.tar $IMAGE_NAME
       - run:
           name: Load the saved docker image
-          command: docker load -i /tmp/workspace/image.tar
+          command: docker load -i ./image.tar
       - run:
           name: Publish latest docker image to dockerhub
           command: |
