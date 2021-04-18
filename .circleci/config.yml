@@ -130,7 +130,7 @@ workflows:
       - run-infra-build:
           requires:
             - hold-infra-build
-      - eb-cli-deploy:
+      - elb-application-deploy:
           requires:
             - run-infra-build
       - hold-destroy:
