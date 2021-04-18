@@ -2,6 +2,9 @@
 version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0
+machine:
+  environment:
+    SHORT_GIT_HASH: $(echo $CIRCLE_SHA1 | cut -c -7)
 executors:
   docker-publisher:
     environment:
@@ -49,7 +52,7 @@ jobs:
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push $IMAGE_NAME:latest
-  plan-apply:
+  run-infra-build:
     working_directory: /tmp/project/
     docker:
       - image: hashicorp/terraform:light
@@ -65,17 +68,6 @@ jobs:
           command: |
             cd infra/
             terraform plan -out tfapply -var-file variables.tfvars
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-  apply:
-    working_directory: /tmp/project/infra
-    docker:
-      - image: hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
       - run:
           name: terraform
           command: |
@@ -85,17 +77,21 @@ jobs:
           root: .
           paths:
             - .
-  eb-cli-deploy:
+  elb-application-deploy:
     executor: aws-cli/default
     steps:
       - checkout
       - aws-cli/setup
       - run:
+          command: echo "Deploying the ElasticBeanstalk application"
+      - run:
           command: |
-            aws s3 cp docker-compose.yml s3://arun-tf-s3-bucket/beanstalk/datasette-docker-env/docker-compose.yml
-            aws elasticbeanstalk create-application-version --application-name datasette-docker-app --source-bundle S3Bucket="arun-tf-s3-bucket",S3Key="beanstalk/datasette-docker-env/docker-compose.yml" --version-label "ver-4" --region us-east-1
+            aws s3 cp docker-compose.yml s3://arun-tf-s3-bucket/${CIRCLE_BRANCH}/beanstalk/datasette-docker-env/docker-compose.yml
+            aws elasticbeanstalk create-application-version --application-name datasette-docker-app-${CIRCLE_BRANCH} \
+             --source-bundle S3Bucket="arun-tf-s3-bucket",S3Key="${CIRCLE_BRANCH}/beanstalk/datasette-docker-env/docker-compose.yml" \
+             --version-label "${CIRCLE_SHA1}" --region us-east-1
             aws elasticbeanstalk update-environment --environment-name datasette-docker-env --version-label "ver-4" --region us-east-1
-  plan-destroy:
+  run-infra-destroy:
     docker:
       - image: hashicorp/terraform:light
     steps:
@@ -106,21 +102,15 @@ jobs:
           command: |
             cd infra/
             terraform plan -destroy -out tfdestroy -var-file variables.tfvars
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-  destroy:
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
       - run:
           name: terraform destroy
           command: |
             cd infra/
             terraform apply -auto-approve tfdestroy
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 workflows:
   # Name the workflow "welcome"
   build-branch:
@@ -133,46 +123,20 @@ workflows:
       - publish-latest:
           requires:
             - build
-      - plan-apply:
+      - hold-infra-build:
+          type: approval
           requires:
             - publish-latest
-      - hold-apply:
-          filters:
-            branches:
-              only:
-                  - master
-          type: approval
+      - run-infra-build:
           requires:
-            - plan-apply
-      - apply:
-          filters:
-            branches:
-              only:
-                  - master
-          requires:
-            - hold-apply
+            - hold-infra-build
       - eb-cli-deploy:
-          filters:
-            branches:
-              only:
-                  - master
           requires:
-            - apply
-      - plan-destroy:
-          requires:
-            - eb-cli-deploy
+            - run-infra-build
       - hold-destroy:
-          filters:
-            branches:
-              only:
-                  - master
           type: approval
           requires:
-            - plan-destroy
-      - destroy:
-          filters:
-            branches:
-              only:
-                  - master
+            - elb-application-deploy
+      - run-infra-destroy:
           requires:
             - hold-destroy
