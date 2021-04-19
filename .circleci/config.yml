@@ -90,11 +90,11 @@ jobs:
           command: echo "Deploying the ElasticBeanstalk application"
       - run:
           command: |
-            aws s3 cp docker-compose.yml s3://arun-tf-s3-bucket/${CIRCLE_BRANCH}/beanstalk/datasette-docker-env/docker-compose.yml
-            aws elasticbeanstalk create-application-version --application-name datasette-docker-app-${CIRCLE_SHA1} \
-             --source-bundle S3Bucket="arun-tf-s3-bucket",S3Key="${CIRCLE_BRANCH}/beanstalk/datasette-docker-env/docker-compose.yml" \
+            aws s3 cp docker-compose.yml s3://arun-tf-s3-bucket/<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml
+            aws elasticbeanstalk create-application-version --application-name datasette-docker-app \
+             --source-bundle S3Bucket="arun-tf-s3-bucket",S3Key="<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml" \
              --version-label "${CIRCLE_SHA1}" --region us-east-1
-            aws elasticbeanstalk update-environment --environment-name datasette-docker-env --version-label "ver-4" --region us-east-1
+            aws elasticbeanstalk update-environment --environment-name datasette-docker-env --version-label "${CIRCLE_SHA1}" --region us-east-1
   run-infra-destroy:
     docker:
       - image: hashicorp/terraform:light
