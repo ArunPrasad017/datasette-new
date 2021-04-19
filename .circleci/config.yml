@@ -130,9 +130,6 @@ workflows:
       - elb-application-deploy:
           requires:
             - run-infra-build
-          filters:
-            branches:
-              only: master
       - hold-destroy:
           type: approval
           requires:
