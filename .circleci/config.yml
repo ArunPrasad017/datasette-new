@@ -12,9 +12,12 @@ executors:
     docker:
       - image: circleci/buildpack-deps:stretch
 parameters:
-  run_infra_pipeline:
+  run-infra-pipeline:
     type: boolean
     default: True
+  run-infra-destroy-pipeline:
+    type: boolean
+    default: False
 jobs:
   pre-commit-check:
     docker:
@@ -56,25 +59,28 @@ jobs:
       - image: hashicorp/terraform:light
     steps:
       - checkout
-      - run:
-          name: terraform init & plan
-          command: |
-            cd infra/
-            terraform init -input=false
-      - run:
-          name: terraform plan
-          command: |
-            cd infra/
-            terraform plan -out tfapply -var-file variables.tfvars
-      - run:
-          name: terraform
-          command: |
-            cd infra/
-            terraform apply -auto-approve tfapply
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+      - when:
+          condition: << pipeline.parameters.run-infra-pipeline >>
+          steps:
+            - run:
+                name: terraform init & plan
+                command: |
+                    cd infra/
+                    terraform init -input=false
+            - run:
+                name: terraform plan
+                command: |
+                  cd infra/
+                  terraform plan -out tfapply -var-file variables.tfvars
+            - run:
+                name: terraform
+                command: |
+                  cd infra/
+                  terraform apply -auto-approve tfapply
+            - persist_to_workspace:
+                root: .
+                paths:
+                  - .
   elb-application-deploy:
     executor: aws-cli/default
     steps:
@@ -93,22 +99,25 @@ jobs:
     docker:
       - image: hashicorp/terraform:light
     steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: terraform create destroy plan
-          command: |
-            cd infra/
-            terraform plan -destroy -out tfdestroy -var-file variables.tfvars
-      - run:
-          name: terraform destroy
-          command: |
-            cd infra/
-            terraform apply -auto-approve tfdestroy
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
+      - when:
+          condition: << pipeline.parameters.run-infra-destroy-pipeline >>
+          steps:
+            - attach_workspace:
+                at: .
+            - run:
+                name: terraform create destroy plan
+                command: |
+                  cd infra/
+                  terraform plan -destroy -out tfdestroy -var-file variables.tfvars
+            - run:
+                name: terraform destroy
+                command: |
+                  cd infra/
+                  terraform apply -auto-approve tfdestroy
+            - persist_to_workspace:
+                root: .
+                paths:
+                  - .
 workflows:
   build-branch:
     jobs:
@@ -116,29 +125,12 @@ workflows:
       - build-publish-image:
           requires:
             - pre-commit-check
-      - hold-infra-build:
-          type: approval
+      - run-infra-build:
           requires:
             - build-publish-image
-      - run-infra-build:
-          when:
-            and:
-              - requires:
-                - hold-infra-build
-              - equal: [True, <<pipeline.parameters.run_infra_pipeline>>]
       - elb-application-deploy:
           requires:
             - run-infra-build
-      - hold-destroy:
-          type: approval
-          requires:
-            - elb-application-deploy
-          filters:
-            branches:
-              only: master
       - run-infra-destroy:
           requires:
-            - hold-destroy
-          filters:
-            branches:
-              only: master
+            - elb-application-deploy
