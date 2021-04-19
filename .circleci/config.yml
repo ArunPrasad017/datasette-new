@@ -11,6 +11,10 @@ executors:
       IMAGE_NAME: arundocker017/datasette-new
     docker:
       - image: circleci/buildpack-deps:stretch
+parameters:
+  run_infra_pipeline:
+    type: boolean
+    default: True
 jobs:
   pre-commit-check:
     docker:
@@ -46,20 +50,6 @@ jobs:
           root: .
           paths:
             - ./image.tar
-  # publish-latest:
-  #   executor: docker-publisher
-  #   steps:
-  #     - attach_workspace:
-  #         at: /tmp/workspace
-  #     - setup_remote_docker
-  #     - run:
-  #         name: Load the saved docker image
-  #         command: docker load -i /tmp/workspace/image.tar
-  #     - run:
-  #         name: Publish latest docker image to dockerhub
-  #         command: |
-  #           echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-  #           docker push $IMAGE_NAME:latest
   run-infra-build:
     working_directory: /tmp/project/
     docker:
@@ -131,18 +121,18 @@ workflows:
           type: approval
           requires:
             - build-publish-image
-          filters:
-            branches:
-              only: master
       - run-infra-build:
-          requires:
-            - hold-infra-build
-          filters:
-            branches:
-              only: master
+          when:
+            and:
+              - requires:
+                - hold-infra-build
+              - equal: [True, <<pipeline.parameters.run_infra_pipeline>>]
       - elb-application-deploy:
           requires:
-            - build-publish-image
+            - run-infra-build
+          filters:
+            branches:
+              only: master
       - hold-destroy:
           type: approval
           requires:
