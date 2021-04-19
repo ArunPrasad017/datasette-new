@@ -99,11 +99,11 @@ jobs:
     docker:
       - image: hashicorp/terraform:light
     steps:
+      - attach_workspace:
+          at: .
       - when:
           condition: << pipeline.parameters.run-infra-destroy-pipeline >>
           steps:
-            - attach_workspace:
-                at: .
             - run:
                 name: terraform create destroy plan
                 command: |
