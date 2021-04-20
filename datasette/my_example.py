@@ -16,6 +16,7 @@ def initialize_db(timestamp):
         requests.get("https://data.nasa.gov/resource/y77d-th95.json").json(),
         pk="id",
     )
+    return timestamp
 
 
 def main():
