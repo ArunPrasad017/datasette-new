@@ -2,12 +2,22 @@
 version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0
+machine:
+  environment:
+    SHORT_GIT_HASH: $(echo $CIRCLE_SHA1 | cut -c -7)
 executors:
   docker-publisher:
     environment:
       IMAGE_NAME: arundocker017/datasette-new
     docker:
       - image: circleci/buildpack-deps:stretch
+parameters:
+  run-infra-pipeline:
+    type: boolean
+    default: False
+  run-infra-destroy-pipeline:
+    type: boolean
+    default: False
 jobs:
   pre-commit-check:
     docker:
@@ -20,7 +30,7 @@ jobs:
       - run:
           name: Run pre-commit
           command: pre-commit run --all-files
-  build:
+  build-publish-image:
     executor: docker-publisher
     steps:
       - checkout
@@ -31,148 +41,96 @@ jobs:
       - run:
           name: Save docker image to local
           command: docker save -o image.tar $IMAGE_NAME
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ./image.tar
-  publish-latest:
-    executor: docker-publisher
-    steps:
-      - attach_workspace:
-          at: /tmp/workspace
-      - setup_remote_docker
       - run:
           name: Load the saved docker image
-          command: docker load -i /tmp/workspace/image.tar
+          command: docker load -i ./image.tar
       - run:
           name: Publish latest docker image to dockerhub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
             docker push $IMAGE_NAME:latest
-  plan-apply:
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./image.tar
+  run-infra-build:
     working_directory: /tmp/project/
     docker:
       - image: hashicorp/terraform:light
     steps:
       - checkout
-      - run:
-          name: terraform init & plan
-          command: |
-            cd infra/
-            terraform init -input=false
-      - run:
-          name: terraform plan
-          command: |
-            cd infra/
-            terraform plan -out tfapply -var-file variables.tfvars
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-  apply:
-    working_directory: /tmp/project/infra
-    docker:
-      - image: hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: terraform
-          command: |
-            cd infra/
-            terraform apply -auto-approve tfapply
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-  eb-cli-deploy:
+      - when:
+          condition: << pipeline.parameters.run-infra-pipeline >>
+          steps:
+            - run:
+                name: terraform init & plan
+                command: |
+                    cd infra/
+                    terraform init -input=false
+            - run:
+                name: terraform plan
+                command: |
+                  cd infra/
+                  terraform plan -out tfapply -var-file variables.tfvars
+            - run:
+                name: terraform
+                command: |
+                  cd infra/
+                  terraform apply -auto-approve tfapply
+            - persist_to_workspace:
+                root: .
+                paths:
+                  - .
+  elb-application-deploy:
     executor: aws-cli/default
     steps:
       - checkout
       - aws-cli/setup
       - run:
+          command: echo "Deploying the ElasticBeanstalk application"
+      - run:
           command: |
-            aws s3 cp docker-compose.yml s3://arun-tf-s3-bucket/beanstalk/datasette-docker-env/docker-compose.yml
-            aws elasticbeanstalk create-application-version --application-name datasette-docker-app --source-bundle S3Bucket="arun-tf-s3-bucket",S3Key="beanstalk/datasette-docker-env/docker-compose.yml" --version-label "ver-4" --region us-east-1
-            aws elasticbeanstalk update-environment --environment-name datasette-docker-env --version-label "ver-4" --region us-east-1
-  plan-destroy:
+            aws s3 cp docker-compose.yml s3://arun-tf-s3-bucket/<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml
+            aws elasticbeanstalk create-application-version --application-name datasette-docker-app \
+             --source-bundle S3Bucket="arun-tf-s3-bucket",S3Key="<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml" \
+             --version-label "${CIRCLE_SHA1}" --region us-east-1
+            aws elasticbeanstalk update-environment --environment-name datasette-docker-env --version-label "${CIRCLE_SHA1}" --region us-east-1
+  run-infra-destroy:
     docker:
       - image: hashicorp/terraform:light
     steps:
       - attach_workspace:
           at: .
-      - run:
-          name: terraform create destroy plan
-          command: |
-            cd infra/
-            terraform plan -destroy -out tfdestroy -var-file variables.tfvars
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
-  destroy:
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          name: terraform destroy
-          command: |
-            cd infra/
-            terraform apply -auto-approve tfdestroy
+      - when:
+          condition: << pipeline.parameters.run-infra-destroy-pipeline >>
+          steps:
+            - run:
+                name: terraform create destroy plan
+                command: |
+                  cd infra/
+                  terraform plan -destroy -out tfdestroy -var-file variables.tfvars
+            - run:
+                name: terraform destroy
+                command: |
+                  cd infra/
+                  terraform apply -auto-approve tfdestroy
+            - persist_to_workspace:
+                root: .
+                paths:
+                  - .
 workflows:
-  # Name the workflow "welcome"
   build-branch:
-    # Run the welcome/run job in its own container
     jobs:
       - pre-commit-check
-      - build:
+      - build-publish-image:
           requires:
             - pre-commit-check
-      - publish-latest:
+      - run-infra-build:
           requires:
-            - build
-      - plan-apply:
+            - build-publish-image
+      - elb-application-deploy:
           requires:
-            - publish-latest
-      - hold-apply:
-          filters:
-            branches:
-              only:
-                  - master
-          type: approval
+            - run-infra-build
+      - run-infra-destroy:
           requires:
-            - plan-apply
-      - apply:
-          filters:
-            branches:
-              only:
-                  - master
-          requires:
-            - hold-apply
-      - eb-cli-deploy:
-          filters:
-            branches:
-              only:
-                  - master
-          requires:
-            - apply
-      - plan-destroy:
-          requires:
-            - eb-cli-deploy
-      - hold-destroy:
-          filters:
-            branches:
-              only:
-                  - master
-          type: approval
-          requires:
-            - plan-destroy
-      - destroy:
-          filters:
-            branches:
-              only:
-                  - master
-          requires:
-            - hold-destroy
+            - elb-application-deploy
