@@ -128,9 +128,20 @@ workflows:
       - run-infra-build:
           requires:
             - build-publish-image
+          filters:
+            branches:
+              only: master
       - elb-application-deploy:
           requires:
             - run-infra-build
+          filters:
+            branches:
+              only: 
+                - master
       - run-infra-destroy:
           requires:
             - elb-application-deploy
+          filters:
+            branches:
+              only: 
+                - master
