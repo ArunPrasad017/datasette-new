@@ -1,9 +1,10 @@
 """
 """
-import requests
-import sqlite_utils
 import logging
 from datetime import datetime
+
+import requests
+import sqlite_utils
 
 log = logging.getLogger(__name__)
 
