@@ -14,10 +14,10 @@ executors:
 parameters:
   run-infra-pipeline:
     type: boolean
-    default: False
+    default: True
   run-infra-destroy-pipeline:
     type: boolean
-    default: False
+    default: True
 jobs:
   pre-commit-check-tests:
     docker:
