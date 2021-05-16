@@ -100,9 +100,9 @@ jobs:
           command: echo "Deploying the ElasticBeanstalk application"
       - run:
           command: |
-            aws s3 cp docker-compose.yml s3://arun-tf-s3-bucket/<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml
+            aws s3 cp docker-compose.yml s3://arun-datasette-bucket/<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml
             aws elasticbeanstalk create-application-version --application-name datasette-docker-app \
-             --source-bundle S3Bucket="arun-tf-s3-bucket",S3Key="<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml" \
+             --source-bundle S3Bucket="arun-datasette-bucket",S3Key="<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml" \
              --version-label "${CIRCLE_SHA1}" --region us-east-1
             aws elasticbeanstalk update-environment --environment-name datasette-docker-env --version-label "${CIRCLE_SHA1}" --region us-east-1
   run-infra-destroy:
