@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "bucket1"{
-    bucket = "arun-tf-s3-bucket"
+    bucket = "arun-datasette-bucket"
     acl = "private"
     versioning{
         enabled = true
@@ -16,7 +16,7 @@ resource "aws_s3_bucket" "bucket1"{
 
 terraform {
   backend "s3" {
-    bucket  = "aruntestbucketaws"
+    bucket  = "arun-useast1-dev-infra"
     key     = "state/s3/s3_test.tfstate"
     region  = "us-east-1"
     encrypt = true
