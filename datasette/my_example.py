@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 url = "https://datahub.io/sports-data/spanish-la-liga/r/season-1819.json"
 
 
-def initialize_db(timestamp):
+def initialize_db(timestamp: datetime) -> datetime:
     print(f"Inside the docker file at - {timestamp}")
     log.debug("This is a debugging message")
     db = sqlite_utils.Database("epl1819.db")
@@ -22,7 +22,7 @@ def initialize_db(timestamp):
     return timestamp
 
 
-def main():
+def main() -> None:
     now = datetime.now()
     initialize_db(now)
 
