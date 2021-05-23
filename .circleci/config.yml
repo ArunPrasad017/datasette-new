@@ -14,7 +14,7 @@ executors:
 parameters:
   run-infra-pipeline:
     type: boolean
-    default: False
+    default: True
   run-infra-destroy-pipeline:
     type: boolean
     default: True
@@ -138,6 +138,9 @@ workflows:
       - run-infra-build:
           requires:
             - build-publish-image
+      - elb-application-deploy:
+          requires:
+            - run-infra-build
       - run-infra-destroy:
           requires:
-            - build-publish-image
+            - elb-application-deploy
