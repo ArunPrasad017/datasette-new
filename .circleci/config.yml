@@ -14,10 +14,10 @@ executors:
 parameters:
   run-infra-pipeline:
     type: boolean
-    default: True
+    default: False
   run-infra-destroy-pipeline:
     type: boolean
-    default: False
+    default: True
 jobs:
   precheck-tests:
     docker:
@@ -138,9 +138,6 @@ workflows:
       - run-infra-build:
           requires:
             - build-publish-image
-      - elb-application-deploy:
-          requires:
-            - run-infra-build
       - run-infra-destroy:
           requires:
-            - elb-application-deploy
+            - build-publish-image
