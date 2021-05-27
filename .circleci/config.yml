@@ -19,23 +19,20 @@ parameters:
     type: boolean
     default: True
 jobs:
-  pre-commit-check-tests:
+  precheck-tests:
     docker:
       - image: cimg/python:3.8
     steps:
       - checkout
-      - run:
-          name: Install pre-commit
-          command: pip install pre-commit
-      - run:
-          name: Run pre-commit
-          command: pre-commit run --all-files
       - run:
           name: Activate VirtualEnv
           command: python3 -m venv pytest-env
       - run:
           name: Run all required libs
           command: pip3 install -r requirements.txt
+      - run:
+          name: code quality checks by tox
+          command: tox
       - run:
           name: Run Pytest
           command: python3 -m pytest --cov-report xml --cov-report term --cov .
@@ -103,9 +100,9 @@ jobs:
           command: echo "Deploying the ElasticBeanstalk application"
       - run:
           command: |
-            aws s3 cp docker-compose.yml s3://arun-tf-s3-bucket/<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml
+            aws s3 cp docker-compose.yml s3://arun-datasette-bucket/<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml
             aws elasticbeanstalk create-application-version --application-name datasette-docker-app \
-             --source-bundle S3Bucket="arun-tf-s3-bucket",S3Key="<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml" \
+             --source-bundle S3Bucket="arun-datasette-bucket",S3Key="<< pipeline.git.branch >>/${CIRCLE_SHA1}/beanstalk/datasette-docker-env/docker-compose.yml" \
              --version-label "${CIRCLE_SHA1}" --region us-east-1
             aws elasticbeanstalk update-environment --environment-name datasette-docker-env --version-label "${CIRCLE_SHA1}" --region us-east-1
   run-infra-destroy:
@@ -134,27 +131,16 @@ jobs:
 workflows:
   build-branch:
     jobs:
-      - pre-commit-check-tests
+      - precheck-tests
       - build-publish-image:
           requires:
-            - pre-commit-check-tests
+            - precheck-tests
       - run-infra-build:
           requires:
             - build-publish-image
-          filters:
-            branches:
-              only: master
       - elb-application-deploy:
           requires:
             - run-infra-build
-          filters:
-            branches:
-              only: 
-                - master
       - run-infra-destroy:
           requires:
             - elb-application-deploy
-          filters:
-            branches:
-              only: 
-                - master
