@@ -14,8 +14,8 @@ url = "https://datahub.io/sports-data/spanish-la-liga/r/season-1819.json"
 def initialize_db(timestamp: datetime) -> datetime:
     print(f"Inside the docker file at - {timestamp}")
     log.debug("This is a debugging message")
-    db = sqlite_utils.Database("epl1819.db")
-    db["epl1819"].insert_all(
+    db = sqlite_utils.Database("laliga1819.db")
+    db["laliga1819"].insert_all(
         requests.get(url).json(),
         pk="id",
     )

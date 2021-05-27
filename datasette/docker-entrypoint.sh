@@ -9,4 +9,4 @@ cd /app/
 python /app/my_example.py
 
 ##step2
-datasette -p 90 -h 0.0.0.0 /app/epl1819.db
+datasette -p 90 -h 0.0.0.0 /app/laliga1819.db
