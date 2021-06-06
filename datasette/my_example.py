@@ -23,7 +23,7 @@ def initialize_db(timestamp: datetime) -> datetime:
 def run_aggregate_query() -> None:
     with open("agg_query.sql", "r") as fd:
         sqlFile = fd.read()
-    db = sqlite_utils.Database(sqlite_utils.connect("my_database.db"))
+    db = sqlite_utils.Database("laliga1819.db")
     db.execute(sqlFile)
 
 
