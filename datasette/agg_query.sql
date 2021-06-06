@@ -3,8 +3,8 @@ with cte_home as
 (
     select 
     HomeTeam as home_team,
-    sum(case when ftr='h' then 3 
-             when ftr='d'then 1
+    sum(case when lower(ftr)='h' then 3 
+             when lower(ftr)='d'then 1
              else 0 end
        ) as home_pts
     from laliga1819
