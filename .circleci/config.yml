@@ -17,7 +17,7 @@ parameters:
     default: True
   run-infra-destroy-pipeline:
     type: boolean
-    default: False
+    default: True
 jobs:
   precheck-tests:
     docker:
