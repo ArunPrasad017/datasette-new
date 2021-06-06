@@ -30,4 +30,4 @@ cte_total as(
 select t.team_name as team, coalesce(sum(t.total_points),0) as season_total_points
 from cte_total t
 group by t.team_name
-order by season_total desc,t.team_name;
+order by season_total_points desc,t.team_name;
