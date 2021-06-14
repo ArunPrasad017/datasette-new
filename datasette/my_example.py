@@ -13,14 +13,20 @@ url = "https://datahub.io/sports-data/spanish-la-liga/r/season-1819.json"
 def initialize_db() -> None:
     db = sqlite_utils.Database("laliga1819.db")
     try:
-        db["laliga1819"].insert_all(
-            requests.get(url).json(),
-            pk="id",
-        )
-    except requests.ConnectionError:
-        log.error("URL undefined")
-        return None
-    return
+        r = requests.get(url)
+        r.raise_for_status()
+        if r.status_code == 200:
+            db["laliga1819"].insert_all(
+                requests.get(url).json(),
+                pk="id",
+            )
+    # except (
+    #     requests.exceptions.HTTPError,
+    #     requests.exceptions.ConnectionError,
+    # ) as e:
+    except Exception as e:
+        log.debug(f"Failed due to: {e}")
+        raise Exception
 
 
 def run_aggregate_query() -> None:
