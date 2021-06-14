@@ -1,5 +1,6 @@
 """
 """
+from os import path
 import logging
 
 import requests
@@ -20,24 +21,28 @@ def initialize_db() -> None:
                 requests.get(url).json(),
                 pk="id",
             )
-    # except (
-    #     requests.exceptions.HTTPError,
-    #     requests.exceptions.ConnectionError,
-    # ) as e:
     except Exception as e:
         log.debug(f"Failed due to: {e}")
         raise Exception
 
 
-def run_aggregate_query() -> None:
+def _read_sql(filename: str) -> str:
     log.info("Read SQL file")
-    with open("agg_query.sql", "r") as fd:
+    basepath = path.dirname(__file__)
+    filepath = path.abspath(path.join(basepath, "..", "..", filename))
+    with open(filepath, "r") as fd:
         sqlFile = fd.read()
+    return sqlFile
+
+
+def run_aggregate_query() -> None:
+    file_name = "agg_query"
+    sqlFile = _read_sql(file_name)
     try:
         db = sqlite_utils.Database("laliga1819.db")
     except Exception as E:
         log.error("DB not found - Exception: {}".format(E))
-        return
+        raise Exception
     log.info("Executing SQL file on laliga db")
     db.execute(sqlFile)
 
