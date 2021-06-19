@@ -1,7 +1,7 @@
 """
 """
-from os import path
 import logging
+from os import path
 
 import requests
 import sqlite_utils
