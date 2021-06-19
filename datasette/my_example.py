@@ -30,6 +30,7 @@ def _read_sql(filename: str) -> str:
     log.info("Read SQL file")
     basepath = path.dirname(__file__)
     filepath = path.abspath(path.join(basepath, "..", "..", filename))
+    # breakpoint()
     with open(filepath, "r") as fd:
         sqlFile = fd.read()
     return sqlFile
