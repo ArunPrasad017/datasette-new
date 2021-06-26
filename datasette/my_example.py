@@ -18,7 +18,7 @@ def initialize_db() -> None:
         r.raise_for_status()
         if r.status_code == 200:
             db["laliga1819"].insert_all(
-                requests.get(url).json(),
+                r.json(),
                 pk="id",
             )
     except Exception as e:
@@ -30,7 +30,6 @@ def _read_sql(filename: str) -> str:
     log.info("Read SQL file")
     basepath = path.dirname(__file__)
     filepath = path.abspath(path.join(basepath, "..", "..", filename))
-    # breakpoint()
     with open(filepath, "r") as fd:
         sqlFile = fd.read()
     return sqlFile
