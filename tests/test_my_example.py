@@ -1,8 +1,6 @@
 import logging
 import pytest
 from unittest import mock
-
-import requests
 from datasette.my_example import initialize_db, _read_sql, run_aggregate_query
 
 LOGGER = logging.getLogger(__name__)
@@ -21,9 +19,9 @@ def test_initialize_db_request_exception() -> None:
 
 def test_initialize_db_request_success() -> None:
     with mock.patch("datasette.my_example.requests") as mock_requests:
-        mock_requests.get("http://test.com")
-        mock_requests.return_value.status_code = 200
-        assert requests.get("http://test.com").status_code == 200
+        mock_requests.get.return_value.status_code = 200
+        initialize_db()
+        mock_requests.get.assert_called_once()
 
 
 def test_db_creation_exception() -> None:
@@ -47,8 +45,5 @@ He doesn't know he is mocked"""
     ) as _file:
         actual = _read_sql(fake_file_path)
         _file.assert_called_once()
-    print(f"{_file.call_args_list=}")
     expected = file_content_mock
-    print(f"{expected=}")
-    print(f"{actual=}")
     assert expected == actual
